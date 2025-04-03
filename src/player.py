@@ -26,18 +26,43 @@ class Player:
         self._max_health = health
         self.x = x
         self.y = y
-        self.width = 50
-        self.height = 50
+        self.width = 32  # Smaller size for pixel art
+        self.height = 48  # Taller than wide for human proportion
         self.inventory = []
-        self.speed = 5  # Movement speed per frame
+        self.speed = 5
         self.attack_power = 10
         self.defense = 5
         self.level = 1
         self.experience = 0
         self.experience_to_level = 100
         
-        # Sprite and animation
-        self.color = (0, 255, 0)  # Default color: green
+        # Create pixelated person sprite
+        self.sprite = self._create_pixel_person()
+        
+    def _create_pixel_person(self) -> pygame.Surface:
+        """Create a pixelated person sprite."""
+        sprite = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
+        
+        # Colors
+        skin_color = (255, 218, 185)  # Peach
+        shirt_color = (30, 144, 255)  # Dodger blue
+        pants_color = (0, 0, 139)     # Dark blue
+        
+        # Head (8x8 pixels at the top)
+        pygame.draw.rect(sprite, skin_color, (12, 0, 8, 8))
+        
+        # Body (12x16 pixels in the middle)
+        pygame.draw.rect(sprite, shirt_color, (10, 8, 12, 16))
+        
+        # Arms (4x12 pixels on each side of body)
+        pygame.draw.rect(sprite, shirt_color, (6, 8, 4, 12))   # Left arm
+        pygame.draw.rect(sprite, shirt_color, (22, 8, 4, 12))  # Right arm
+        
+        # Legs (6x16 pixels each)
+        pygame.draw.rect(sprite, pants_color, (10, 24, 6, 20))  # Left leg
+        pygame.draw.rect(sprite, pants_color, (16, 24, 6, 20))  # Right leg
+        
+        return sprite
         
     @property
     def health(self) -> int:
@@ -152,11 +177,14 @@ class Player:
     def draw(self, screen: pygame.Surface) -> None:
         """
         Draw the player on the screen.
-        """
-        # Draw a simple rectangle for the player
-        pygame.draw.rect(screen, self.color, (self.x, self.y, self.width, self.height))
         
-        # Draw player name above rectangle
+        Args:
+            screen: The Pygame surface to draw on
+        """
+        # Draw the pixelated person sprite
+        screen.blit(self.sprite, (self.x, self.y))
+        
+        # Draw player name above sprite
         font = pygame.font.SysFont('Arial', 18)
         name_text = font.render(self.name, True, (255, 255, 255))
         screen.blit(name_text, (self.x + self.width // 2 - name_text.get_width() // 2, self.y - 20)) 

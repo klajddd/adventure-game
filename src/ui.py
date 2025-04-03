@@ -34,6 +34,7 @@ class UI:
         self.bg_color = (0, 0, 50)
         self.button_color = (80, 80, 200)
         self.button_hover_color = (100, 100, 255)
+        self.id_card_color = (40, 40, 40)  # Dark gray for ID card
         
         # Menu options
         self.menu_options = ["Start Game", "Help", "Quit"]
@@ -91,6 +92,50 @@ class UI:
                      self.small_font, self.text_color,
                      self.width // 2, self.height - 50, centered=True)
                      
+    def draw_player_id_card(self, player: 'Player') -> None:
+        """
+        Draw a player ID card in the top-right corner of the screen.
+        
+        Args:
+            player: The player object to display info for
+        """
+        # Card dimensions and position
+        card_width = 200
+        card_height = 100
+        card_x = self.width - card_width - 20
+        card_y = 20
+        
+        # Draw card background
+        card_surface = pygame.Surface((card_width, card_height))
+        card_surface.set_alpha(220)  # Semi-transparent
+        card_surface.fill(self.id_card_color)
+        self.screen.blit(card_surface, (card_x, card_y))
+        
+        # Draw card border
+        pygame.draw.rect(self.screen, (100, 100, 100), (card_x, card_y, card_width, card_height), 2)
+        
+        # Draw player name
+        name_text = self.normal_font.render(player.name, True, self.highlight_color)
+        self.screen.blit(name_text, (card_x + 10, card_y + 10))
+        
+        # Draw health bar
+        health_pct = player.health / player._max_health
+        bar_width = 180
+        health_width = bar_width * health_pct
+        
+        # Health bar background (red)
+        pygame.draw.rect(self.screen, (255, 0, 0), (card_x + 10, card_y + 40, bar_width, 15))
+        # Health bar foreground (green)
+        pygame.draw.rect(self.screen, (0, 255, 0), (card_x + 10, card_y + 40, health_width, 15))
+        
+        # Draw health text
+        health_text = self.small_font.render(f"HP: {player.health}/{player._max_health}", True, self.text_color)
+        self.screen.blit(health_text, (card_x + 10, card_y + 60))
+        
+        # Draw level
+        level_text = self.small_font.render(f"Level: {player.level}", True, self.text_color)
+        self.screen.blit(level_text, (card_x + card_width - 60, card_y + 60))
+        
     def draw_player_stats(self, player: 'Player') -> None:
         """
         Draw the player's stats on the screen.
@@ -98,36 +143,9 @@ class UI:
         Args:
             player: The player object to display stats for
         """
-        # Draw a semi-transparent background for the stats panel
-        stats_surface = pygame.Surface((250, 80))
-        stats_surface.set_alpha(180)
-        stats_surface.fill((0, 0, 0))
-        self.screen.blit(stats_surface, (10, self.height - 90))
+        # Only draw the ID card in top-right corner
+        self.draw_player_id_card(player)
         
-        # Draw player name
-        self.draw_text(player.name, self.normal_font, self.text_color, 20, self.height - 85)
-        
-        # Draw health bar
-        health_pct = player.health / player._max_health
-        bar_width = 200
-        health_width = bar_width * health_pct
-        
-        # Health bar background (red)
-        pygame.draw.rect(self.screen, (255, 0, 0), (20, self.height - 60, bar_width, 15))
-        # Health bar foreground (green)
-        pygame.draw.rect(self.screen, (0, 255, 0), (20, self.height - 60, health_width, 15))
-        # Health text
-        self.draw_text(f"HP: {player.health}/{player._max_health}", self.small_font, 
-                     self.text_color, 25, self.height - 60)
-        
-        # Draw level and XP
-        self.draw_text(f"Level: {player.level}  XP: {player.experience}/{player.experience_to_level}", 
-                     self.small_font, self.text_color, 20, self.height - 40)
-        
-        # Draw attack and defense
-        self.draw_text(f"ATK: {player.attack_power}  DEF: {player.defense}", 
-                     self.small_font, self.text_color, 20, self.height - 20)
-                     
     def draw_inventory(self, inventory: List['Item']) -> None:
         """
         Draw the player's inventory screen.
